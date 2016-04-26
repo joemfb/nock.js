@@ -1,0 +1,27 @@
+{
+  "name": "nock.js",
+  "version": "1.0.0",
+  "description": "Nock interpreter",
+  "main": "nock.js",
+  "scripts": {
+    "test": "mocha test.js "
+  },
+  "author": "joemfb",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joemfb/nock.js.git"
+  },
+  "keywords": [
+    "nock",
+    "urbit"
+  ],
+  "bugs": {
+    "url": "https://github.com/joemfb/nock.js/issues"
+  },
+  "homepage": "https://github.com/joemfb/nock.js#readme"
+}
