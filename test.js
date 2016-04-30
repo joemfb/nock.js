@@ -32,7 +32,6 @@ describe('operators', function() {
     expect(op.fas(5, [[2, 0], [3, 1]])).to.equal(0)
     expect(op.fas(6, [[2, 0], [3, 1]])).to.equal(3)
     expect(op.fas(7, [[2, 0], [3, 1]])).to.equal(1)
-    expect(function() { op.fas(8, [[2, 0], [3, 1]]) }).to.throw(/invalid fas addr: 8/)
   })
 })
 
@@ -41,6 +40,7 @@ describe('formulas', function() {
 
   it('should eval slot (0)', function() {
     expect(f.slot([[2, 0], [3, 1]], 4)).to.equal(2)
+    expect(function() { f.slot([[2, 0], [3, 1]], 8) }).to.throw(/invalid fas addr: 8/)
   })
 
   it('should eval constant (1)', function() {

@@ -61,11 +61,7 @@ function fas(addr, n) {
   if (addr === 2) return n[0]
   if (addr === 3) return n[1]
 
-  var prod = fas(2 + (addr % 2), fas((addr / 2)|0, n))
-
-  if (prod === undefined) throw new Error('invalid fas addr: ' + addr)
-
-  return prod
+  return fas(2 + (addr % 2), fas((addr / 2)|0, n))
 }
 
 /*** formulas ***/
@@ -76,7 +72,15 @@ function fas(addr, n) {
  *   *[a 0 b]         /[b a]
  */
 function slot(s, f) {
-  return fas(f, s)
+  var p, err
+
+  try { p = fas(f, s) }
+  catch (ex) { err = ex }
+
+  if (err) throw err
+  if (p === undefined) throw new Error ('invalid fas addr: ' + f)
+
+  return p
 }
 
 /**
