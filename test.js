@@ -92,9 +92,51 @@ describe('formulas', function() {
   // })
 })
 
+describe('macro formulas', function() {
+  var f = nock.formulas
+
+  beforeEach(function() {
+    nock.useMacros()
+  })
+
+  // it('should eval ife macro (6)', function() {
+  //   // TODO:
+  // })
+
+  it('should eval compose macro (7)', function() {
+    expect(f.compose_m(42, [[3, [0, 1]], [4, [0, 1]]])).to.equal(2)
+    expect(f.compose_m(42, [[4, [0, 1]], [4, [0, 1]]])).to.equal(44)
+  })
+
+  it('should eval extend macro (8)', function() {
+    var n = f.extend_m(42, [[4, [0, 1]], [0, 1]])
+    expect(n[0]).to.equal(43)
+    expect(n[1]).to.equal(42)
+    expect(f.extend_m(42, [[4, [0, 1]], [4, [0, 3]]])).to.equal(43)
+  })
+
+  // it('should eval invoke macro (9)', function() {
+  //   // TODO:
+  // })
+
+  // it('should eval hint macro (10)', function() {
+  //   // TODO:
+  // })
+})
+
 describe('nock', function() {
+  var dec1 = [8, [1, 0], 8, [1, 6, [5, [0, 7], 4, 0, 6], [0, 6], 9, 2, [0, 2], [4, 0, 6], 0, 7], 9, 2, 0, 1]
+  var dec2 = [7, [0, 1], 8, [1, 0], 8, [1, 6, [5, [0, 7], 4, 0, 6], [0, 6], 9, 2, [0, 2], [4, 0, 6], 0, 7], 9, 2, 0, 1]
+
   it('should decrement', function() {
-    expect(nock.nock(42, [8, [1, 0], 8, [1, 6, [5, [0, 7], 4, 0, 6], [0, 6], 9, 2, [0, 2], [4, 0, 6], 0, 7], 9, 2, 0, 1]))
-    .to.equal(41)
+    nock.useMacros(false)
+    expect(nock.nock(42, dec1)).to.equal(41)
+    expect(nock.nock(42, dec2)).to.equal(41)
+  })
+
+  it('should decrement with macros', function() {
+    nock.useMacros()
+    expect(nock.nock(42, dec1)).to.equal(41)
+    expect(nock.nock(42, dec2)).to.equal(41)
   })
 })
