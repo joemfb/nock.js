@@ -127,6 +127,7 @@ describe('macro formulas', function() {
 describe('nock', function() {
   var dec1 = [8, [1, 0], 8, [1, 6, [5, [0, 7], 4, 0, 6], [0, 6], 9, 2, [0, 2], [4, 0, 6], 0, 7], 9, 2, 0, 1]
   var dec2 = [7, [0, 1], 8, [1, 0], 8, [1, 6, [5, [0, 7], 4, 0, 6], [0, 6], 9, 2, [0, 2], [4, 0, 6], 0, 7], 9, 2, 0, 1]
+  var dec3 = "[7 [1 42] 7 [0 1] 8 [1 0] 8 [1 6 [5 [0 7] 4 0 6] [0 6] 9 2 [0 2] [4 0 6] 0 7] 9 2 0 1]"
 
   it('should decrement', function() {
     nock.useMacros(false)
@@ -138,5 +139,10 @@ describe('nock', function() {
     nock.useMacros()
     expect(nock.nock(42, dec1)).to.equal(41)
     expect(nock.nock(42, dec2)).to.equal(41)
+  })
+
+  it('should parse hoon/nock tape and decrement', function() {
+    nock.useMacros(false)
+    expect(nock.nock(dec3)).to.equal(41)
   })
 })

@@ -226,7 +226,7 @@ function nock(s, f) {
   return formulas[f[0]](s, f[1])
 }
 
-/* group an array into pairs, associating right */
+/* construct a JS noun (group an array into pairs, associating right) */
 function assoc(x) {
   if (!x.length) return x
 
@@ -235,17 +235,35 @@ function assoc(x) {
   return [assoc(x[0]), assoc(x.slice(1))]
 }
 
+/* parse a hoon-serialized nock formula and construct a JS noun */
+function parseNoun(x) {
+  var str = x.replace(/[\."']/g, '').split(' ').join(',')
+  return assoc(JSON.parse(str))
+}
+
 module.exports = {
   nock: function() {
-    var args = assoc([].slice.call(arguments))
-    return nock(args[0], args[1])
+    var args = [].slice.call(arguments)
+    var noun
+
+    if (args.length === 1 && typeof args[0] === 'string') {
+      // `[0, 1]` is the default subject (`!=(.)` in Hoon/Dojo)
+      noun = [[0, 1], parseNoun(args[0])]
+    } else {
+      noun = assoc(args)
+    }
+
+    return nock(noun[0], noun[1])
   },
   useMacros: function(arg) {
     useMacros = arg === undefined || arg
     return this
   },
   _nock: nock,
-  util: { assoc: assoc },
+  util: {
+    assoc: assoc,
+    parseNoun: parseNoun
+  },
   operators: {
     wut: wut,
     lus: lus,
