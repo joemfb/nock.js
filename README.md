@@ -91,7 +91,7 @@ Nock defines 6 primitive formulas:
 
 - *slot* (0): resolve a tree address
 - *constant* (1): return the formula regardless of subject
-- *evaluate* (2): apply the product of second formula to the product of the first
+- *evaluate* (2): evaluate the product of second formula against the product of the first
 - *cell* (3): test if the product is a cell
 - *incr* (4): increment the product
 - *eq* (5): test for equality between nouns in the product
@@ -109,6 +109,6 @@ And five additional formulas, reducible to the 6 above:
 
 - *ife* (6): if/then/else
 - *compose* (7): evaluate formulas composed left-to-right
-- *extend* (8): evaluate the product of the first formula against the second
-- *invoke* (9): evaluate formulas composed right-to-left
+- *extend* (8): evaluate the second formula against [product of first, subject]
+- *invoke* (9): construct a core and evaluate one of it's arms against it
 - *hint* (10): skip first formula, evaluate second

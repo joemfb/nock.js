@@ -95,7 +95,7 @@ function constant(s, f) {
 }
 
 /**
- * evaluate (2): apply the product of second formula to the product of the first
+ * evaluate (2): evaluate the product of second formula against the product of the first
  *
  *   *[a 2 b c]  *[*[a b] *[a c]]
  */
@@ -160,7 +160,7 @@ function compose(s, f) {
 }
 
 /**
- * extend (8): evaluate the product of the first formula against the second
+ * extend (8): evaluate the second formula against [product of first, subject]
  *
  *   *[a 8 b c]  *[a 7 [[7 [0 1] b] 0 1] c]
  */
@@ -175,7 +175,7 @@ function extend(s, f) {
 }
 
 /**
- * invoke (9): evaluate formulas composed right-to-left
+ * invoke (9): construct a core and evaluate one of it's arms against it
  *
  *   *[a 9 b c]  *[a 7 c 2 [0 1] 0 b]
  */
