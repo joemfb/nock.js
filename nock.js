@@ -8,13 +8,15 @@
  */
 
 var useMacros = false;
+var verbose = true;
 
 /*
  *  code conventions:
  *
  *    `n` is a noun,
  *    `s` is a subject noun,
- *    `f` is a formula (or cell of formulas)
+ *    `f` is a formula (or cell of formulas),
+ *    `d` is stack depth (for verbose logging)
  */
 
 /*** operators ***/
@@ -107,8 +109,8 @@ function constant(s, f) {
  *
  *   *[a 2 b c]  *[*[a b] *[a c]]
  */
-function evaluate(s, f) {
-  return nock(nock(s, f[0]), nock(s, f[1]))
+function evaluate(s, f, d) {
+  return nock(nock(s, f[0], d + 1), nock(s, f[1], d + 1), d)
 }
 
 /**
@@ -116,8 +118,8 @@ function evaluate(s, f) {
  *
  *   *[a 3 b]         ?*[a b]
  */
-function cell(s, f) {
-  return wut(nock(s, f))
+function cell(s, f, d) {
+  return wut(nock(s, f, d))
 }
 
 /**
@@ -125,8 +127,8 @@ function cell(s, f) {
  *
  *   *[a 4 b]         +*[a b]
  */
-function incr(s, f) {
-  return lus(nock(s, f))
+function incr(s, f, d) {
+  return lus(nock(s, f, d))
 }
 
 /**
@@ -134,8 +136,8 @@ function incr(s, f) {
  *
  *   *[a 5 b]         =*[a b]
  */
-function eq(s, f) {
-  return tis(nock(s, f))
+function eq(s, f, d) {
+  return tis(nock(s, f, d))
 }
 
 /**
@@ -143,13 +145,13 @@ function eq(s, f) {
  *
  *   *[a 6 b c d]      *[a 2 [0 1] 2 [1 c d] [1 0] 2 [1 2 3] [1 0] 4 4 b]
  */
-function ife_m(s, f) {
-  return nock(s, [2, [[0, 1], [2, [[1, [f[1][0], f[1][1]]], [[1, 0], [2, [[1, [2, 3]], [[1, 0], [4, [4, f[0]]]]]]]]]]])
+function ife_m(s, f, d) {
+  return nock(s, [2, [[0, 1], [2, [[1, [f[1][0], f[1][1]]], [[1, 0], [2, [[1, [2, 3]], [[1, 0], [4, [4, f[0]]]]]]]]]]], d)
 }
 
-function ife(s, f) {
+function ife(s, f, d) {
   // TODO: fix; this is the simplified version
-  return nock(s, f[0]) === 0 ? nock(s, f[1][0]) : nock(s, f[1][1])
+  return nock(s, f[0]) === 0 ? nock(s, f[1][0]) : nock(s, f[1][1], d)
 }
 
 /**
@@ -157,14 +159,14 @@ function ife(s, f) {
  *
  *   *[a 7 b c]  *[a 2 b 1 c]
  */
-function compose_m(s, f) {
-  return nock(s, [2, [f[0], [1, f[1]]]])
+function compose_m(s, f, d) {
+  return nock(s, [2, [f[0], [1, f[1]]]], d)
 }
 
-function compose(s, f) {
+function compose(s, f, d) {
   // alternate form:
   // return nock(nock(s, f[0]), constant(s, f[1]))
-  return nock(nock(s, f[0]), f[1])
+  return nock(nock(s, f[0], d + 1), f[1], d)
 }
 
 /**
@@ -172,14 +174,14 @@ function compose(s, f) {
  *
  *   *[a 8 b c]  *[a 7 [[7 [0 1] b] 0 1] c]
  */
-function extend_m(s, f) {
-  return nock(s, [7, [[[7, [[0, 1], f[0]]], [0, 1]], f[1]]])
+function extend_m(s, f, d) {
+  return nock(s, [7, [[[7, [[0, 1], f[0]]], [0, 1]], f[1]]], d)
 }
 
-function extend(s, f) {
+function extend(s, f, d) {
   // alternate form:
   // return nock([compose(s, [[0, 1], f[0]]), s], f[1])
-  return nock([nock(s, f[0]), s], f[1])
+  return nock([nock(s, f[0], d + 1), s], f[1], d)
 }
 
 /**
@@ -187,13 +189,13 @@ function extend(s, f) {
  *
  *   *[a 9 b c]  *[a 7 c 2 [0 1] 0 b]
  */
-function invoke_m(s, f) {
-  return nock(s, [7, [f[1], [2, [[0, 1], [0, f[0]]]]]])
+function invoke_m(s, f, d) {
+  return nock(s, [7, [f[1], [2, [[0, 1], [0, f[0]]]]]], d)
 }
 
-function invoke(s, f) {
-  var prod = nock(s, f[1])
-  return nock(prod, slot(prod, f[0]))
+function invoke(s, f, d) {
+  var prod = nock(s, f[1], d + 1)
+  return nock(prod, slot(prod, f[0]), d)
 }
 
 /**
@@ -202,14 +204,14 @@ function invoke(s, f) {
  *   *[a 10 [b c] d]  *[a 8 c 7 [0 3] d]
  *   *[a 10 b c]      *[a c]
  */
-function hint_m(s, f) {
-  if (wut(f[0]) === 1) return nock(s, [8, [f[0][1], [7, [[0, 3], f[1][1]]]]])
-  return nock(s, f[1])
+function hint_m(s, f, d) {
+  if (wut(f[0]) === 1) return nock(s, [8, [f[0][1], [7, [[0, 3], f[1][1]]]]], d)
+  return nock(s, f[1], d)
 }
 
-function hint(s, f) {
-  if (wut(f[0]) === 1) nock(s, f[0][1])
-  return nock(s, f[1])
+function hint(s, f, d) {
+  if (wut(f[0]) === 1) nock(s, f[0][1], d)
+  return nock(s, f[1], d)
 }
 
 /*** indexed formula functions ***/
@@ -224,14 +226,20 @@ var formulas = [slot, constant, evaluate, cell, incr, eq, ife, compose, extend, 
  *   *[a [b c] d]     [*[a b c] *[a d]]
  *   *a               *a
  */
-function nock(s, f) {
-  if (wut(f[0]) === 0) return [nock(s, f[0]), nock(s, f[1])]
+function nock(s, f, d) {
+  if (d === undefined) d = 0
+
+  d++
+
+  if (wut(f[0]) === 0) return [nock(s, f[0], d), nock(s, f[1], d)]
+
+  if (verbose) log(s, f, d)
 
   if (f[0] > 10) throw new Error('invalid formula: ' + f[0])
 
-  if (useMacros) return formulas_m[f[0]](s, f[1])
+  if (useMacros) return formulas_m[f[0]](s, f[1], d)
 
-  return formulas[f[0]](s, f[1])
+  return formulas[f[0]](s, f[1], d)
 }
 
 /* construct a JS noun (group an array into pairs, associating right) */
@@ -261,6 +269,25 @@ function nockInterface() {
   }
 
   return nock(noun[0], noun[1])
+}
+
+function pad(d) {
+  var p = ''
+  var i
+
+  for (i = 0; i < d; i++) {
+    p += ' '
+  }
+
+  return p
+}
+
+function log(s, f, d) {
+  var p = pad(d)
+
+  console.log(p + formulas[f[0]].name + ':')
+  // console.log(p + JSON.stringify(s))
+  // console.log(p + JSON.stringify(f[1]))
 }
 
 module.exports = {
