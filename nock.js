@@ -9,6 +9,14 @@
 
 var useMacros = false;
 
+/*
+ *  code conventions:
+ *
+ *    `n` is a noun,
+ *    `s` is a subject noun,
+ *    `f` is a formula (or cell of formulas)
+ */
+
 /*** operators ***/
 
 /**
@@ -241,25 +249,27 @@ function parseNoun(x) {
   return assoc(JSON.parse(str))
 }
 
+function nockInterface() {
+  var args = [].slice.call(arguments)
+  var noun
+
+  if (args.length === 1 && typeof args[0] === 'string') {
+    // `[0, 1]` is the default subject (`!=(.)` in Hoon/Dojo)
+    noun = [[0, 1], parseNoun(args[0])]
+  } else {
+    noun = assoc(args)
+  }
+
+  return nock(noun[0], noun[1])
+}
+
 module.exports = {
-  nock: function() {
-    var args = [].slice.call(arguments)
-    var noun
-
-    if (args.length === 1 && typeof args[0] === 'string') {
-      // `[0, 1]` is the default subject (`!=(.)` in Hoon/Dojo)
-      noun = [[0, 1], parseNoun(args[0])]
-    } else {
-      noun = assoc(args)
-    }
-
-    return nock(noun[0], noun[1])
-  },
+  nock: nockInterface,
+  _nock: nock,
   useMacros: function(arg) {
     useMacros = arg === undefined || arg
     return this
   },
-  _nock: nock,
   util: {
     assoc: assoc,
     parseNoun: parseNoun
