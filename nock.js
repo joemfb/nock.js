@@ -146,8 +146,12 @@ function macroIfe (s, f) {
 }
 
 function ife (s, f) {
-  // TODO: fix; this is the simplified version
-  return nock(s, f[0]) === 0 ? nock(s, f[1][0]) : nock(s, f[1][1])
+  var cond = nock(s, f[0])
+
+  if (cond === 0) return nock(s, f[1][0])
+  if (cond === 1) return nock(s, f[1][1])
+
+  throw new Error('invalid ife conditional')
 }
 
 /**

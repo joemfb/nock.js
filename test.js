@@ -68,9 +68,24 @@ describe('formulas', function () {
     expect(f.eq([0, 1], [0, 1])).to.equal(1)
   })
 
-  // it('should eval ife (6)', function () {
-  //   // TODO:
-  // })
+  it('should eval ife (6)', function () {
+    var n = f.ife([0, 1], [[1, 0], [[1, 8], [1, 9]]])
+    expect(n).to.equal(8)
+
+    n = f.ife([0, 1], [[1, 1], [[1, 8], [1, 9]]])
+    expect(n).to.equal(9)
+
+    n = f.ife([0, 1], [[5, [[1, 1], [1, 1]]], [[1, 8], [1, 9]]])
+    expect(n).to.equal(8)
+
+    n = f.ife([0, 1], [[5, [[1, 1], [1, 0]]], [[1, 8], [1, 9]]])
+    expect(n).to.equal(9)
+
+    var fn = function () {
+      f.ife([0, 1], [[1, 2], [[1, 8], [1, 9]]])
+    }
+    expect(fn).to.throw(Error)
+  })
 
   it('should eval compose (7)', function () {
     expect(f.compose(42, [[3, [0, 1]], [4, [0, 1]]])).to.equal(2)
@@ -100,9 +115,24 @@ describe('macro formulas', function () {
     nock.useMacros()
   })
 
-  // it('should eval ife macro (6)', function () {
-  //   // TODO:
-  // })
+  it('should eval ife macro (6)', function () {
+    var n = f.macroIfe([0, 1], [[1, 0], [[1, 8], [1, 9]]])
+    expect(n).to.equal(8)
+
+    n = f.macroIfe([0, 1], [[1, 1], [[1, 8], [1, 9]]])
+    expect(n).to.equal(9)
+
+    n = f.macroIfe([0, 1], [[5, [[1, 1], [1, 1]]], [[1, 8], [1, 9]]])
+    expect(n).to.equal(8)
+
+    n = f.macroIfe([0, 1], [[5, [[1, 1], [1, 0]]], [[1, 8], [1, 9]]])
+    expect(n).to.equal(9)
+
+    var fn = function () {
+      f.macroIfe([0, 1], [[1, 2], [[1, 8], [1, 9]]])
+    }
+    expect(fn).to.throw(Error)
+  })
 
   it('should eval compose macro (7)', function () {
     expect(f.macroCompose(42, [[3, [0, 1]], [4, [0, 1]]])).to.equal(2)
