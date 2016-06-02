@@ -103,9 +103,21 @@ describe('formulas', function () {
   //   // TODO:
   // })
 
-  // it('should eval hint (10)', function () {
-  //   // TODO:
-  // })
+  it('should eval hint (10)', function () {
+    var n = f.hint([0, 1], [1, [1, 1]])
+    expect(n).to.equal(1)
+
+    n = f.hint([132, 19], [37, [4, [0, 3]]])
+    expect(n).to.equal(20)
+
+    n = f.hint([132, 19], [[37, [1, 0]], [4, [0, 3]]])
+    expect(n).to.equal(20)
+
+    var fn = function () {
+      f.hint([0, 1], [[1, 0], [1, 1]])
+    }
+    expect(fn).to.throw(Error)
+  })
 })
 
 describe('macro formulas', function () {
@@ -150,9 +162,21 @@ describe('macro formulas', function () {
   //   // TODO:
   // })
 
-  // it('should eval hint macro (10)', function () {
-  //   // TODO:
-  // })
+  it('should eval hint macro (10)', function () {
+    var n = f.macroHint([0, 1], [1, [1, 1]])
+    expect(n).to.equal(1)
+
+    n = f.macroHint([132, 19], [37, [4, [0, 3]]])
+    expect(n).to.equal(20)
+
+    n = f.macroHint([132, 19], [[37, [1, 0]], [4, [0, 3]]])
+    expect(n).to.equal(20)
+
+    var fn = function () {
+      f.macroHint([0, 1], [[1, 0], [1, 1]])
+    }
+    expect(fn).to.throw(Error)
+  })
 })
 
 describe('nock', function () {

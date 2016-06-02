@@ -205,12 +205,15 @@ function invoke (s, f) {
  *   *[a 10 b c]      *[a c]
  */
 function macroHint (s, f) {
-  if (wut(f[0]) === 1) return nock(s, [8, [f[0][1], [7, [[0, 3], f[1][1]]]]])
+  if (wut(f[0]) === 0) return nock(s, [8, [f[0][1], [7, [[0, 3], f[1]]]]])
   return nock(s, f[1])
 }
 
 function hint (s, f) {
-  if (wut(f[0]) === 1) nock(s, f[0][1])
+  if (wut(f[0]) === 0) {
+    if (wut(f[0][1]) === 1) throw new Error('invalid hint')
+    nock(s, f[0][1])
+  }
   return nock(s, f[1])
 }
 
