@@ -27,6 +27,7 @@ describe('operators', function () {
   })
 
   it('should resolve tree address (fas /)', function () {
+    expect(function () { op.fas(1, undefined) }).to.throw(/invalid fas noun/)
     expect(function () { op.fas(0, 1) }).to.throw(/invalid fas addr/)
     expect(op.fas(1, 0)).to.equal(0)
     expect(op.fas(2, [1, 0])).to.equal(1)
@@ -211,6 +212,13 @@ describe('nock', function () {
     nock.useMacros(false)
     expect(nock.nock(42, dec1)).to.equal(41)
     expect(nock.nock(42, dec2)).to.equal(41)
+  })
+
+  it('should err on invalid formula', function () {
+    var fn = function () {
+      nock.nock([0, 1], [11, 1])
+    }
+    expect(fn).to.throw(Error)
   })
 
   it('should decrement with macros', function () {
