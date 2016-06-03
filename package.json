@@ -7,6 +7,7 @@
     "lint": "standard nock.js test.js",
     "test": "istanbul cover _mocha"
   },
+  "tonicExampleFilename": "tonic-example.js",
   "author": "joemfb",
   "license": "MIT",
   "devDependencies": {
