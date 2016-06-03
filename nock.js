@@ -277,22 +277,39 @@
 
   /* parse a hoon-serialized nock formula and construct a JS noun */
   function parseNoun (x) {
-    var str = x.replace(/[\."']/g, '').split(' ').join(',')
-    return assoc(JSON.parse(str))
+    if (Array.isArray(x)) return assoc(x)
+
+    if (typeof x === 'string') {
+      var str = x.replace(/[\."']/g, '').split(' ').join(',')
+      return assoc(JSON.parse(str))
+    }
+
+    return x
   }
 
   function nockInterface () {
     var args = [].slice.call(arguments)
-    var noun
+    var subject, formula, noun
 
-    if (args.length === 1 && typeof args[0] === 'string') {
-      // `[0, 1]` is the default subject (`!=(.)` in Hoon/Dojo)
-      noun = [[0, 1], parseNoun(args[0])]
+    if (args.length === 1) {
+      formula = parseNoun(args[0])
+    } else if (args.length === 2) {
+      subject = parseNoun(args[0])
+      formula = parseNoun(args[1])
     } else {
       noun = assoc(args)
+      subject = noun[0]
+      formula = noun[1]
     }
 
-    return nock(noun[0], noun[1])
+    if (!formula) throw new Error('formula required')
+
+    if (!subject) {
+      // !=(~)
+      subject = [1, 0]
+    }
+
+    return nock(subject, formula)
   }
 
   return {

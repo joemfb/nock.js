@@ -214,6 +214,13 @@ describe('nock', function () {
     expect(nock.nock(42, dec2)).to.equal(41)
   })
 
+  it('should err on missing formula', function () {
+    var fn = function () {
+      nock.nock()
+    }
+    expect(fn).to.throw(/formula required/)
+  })
+
   it('should err on invalid formula', function () {
     var fn = function () {
       nock.nock([0, 1], [11, 1])
