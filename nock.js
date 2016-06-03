@@ -49,8 +49,7 @@ function lus (n) {
  */
 function tis (n) {
   if (wut(n) === 1) throw new Error('tis atom')
-  // TODO: s/b recursive?
-  return n[0] === n[1] ? 0 : 1
+  return deepEqual(n[0], n[1]) ? 0 : 1
 }
 
 /**
@@ -250,6 +249,20 @@ function assoc (x) {
   return [assoc(x[0]), assoc(x.slice(1))]
 }
 
+/* deep equality for arrays or primitives */
+function deepEqual (a, b) {
+  if (a === b) return true
+
+  if (!(Array.isArray(a) && Array.isArray(b))) return false
+  if (a.length !== b.length) return false
+
+  for (var i = 0; i < a.length; i++) {
+    if (!deepEqual(a[i], b[i])) return false
+  }
+
+  return true
+}
+
 /* parse a hoon-serialized nock formula and construct a JS noun */
 function parseNoun (x) {
   var str = x.replace(/[\."']/g, '').split(' ').join(',')
@@ -279,7 +292,8 @@ module.exports = {
   },
   util: {
     assoc: assoc,
-    parseNoun: parseNoun
+    parseNoun: parseNoun,
+    deepEqual: deepEqual
   },
   operators: {
     wut: wut,

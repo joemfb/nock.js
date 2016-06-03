@@ -21,7 +21,9 @@ describe('operators', function () {
     expect(op.tis([0, 0])).to.equal(0)
     expect(op.tis([1, 0])).to.equal(1)
     expect(function () { op.tis(0) }).to.throw(/tis atom/)
-    // expect(op.tis([[0, 1], [0, 1]])).to.equal(0)
+    expect(op.tis([[0, 1], [0, 1]])).to.equal(0)
+    expect(op.tis([[0, 1], [1, 1]])).to.equal(1)
+    expect(op.tis([[0, 1], [0, 1, 1]])).to.equal(1)
   })
 
   it('should resolve tree address (fas /)', function () {
