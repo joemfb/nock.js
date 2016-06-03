@@ -99,9 +99,22 @@ describe('formulas', function () {
     expect(f.extend(42, [[4, [0, 1]], [4, [0, 3]]])).to.equal(43)
   })
 
-  // it('should eval invoke (9)', function () {
-  //   // TODO:
-  // })
+  it('should eval invoke (9)', function () {
+    // generated via hoon:
+    // !=((|=(@ +(a)) 2))
+    var subject = [[[4, [0, 6]], [0, [0, 1]]], [0, 1]]
+    var formula = [2, [[0, 4], [[7, [[0, 3], [1, 2]]], [0, 11]]]]
+    var n = f.invoke(subject, formula)
+    expect(n).to.equal(3)
+
+    // generated via hoon (kernel decrement):
+    // (dec 10)
+    // !=((|=(a/@ ?<(=(0 a) =+(b=0 |-(^-(@ ?:(=(a +(b)) b $(b +(b)))))))) 10))
+    subject = [[[6, [[5, [[1, 0], [0, 6]]], [[0, 0], [8, [[1, 0], [8, [[1, [6, [[5, [[0, 30], [4, [0, 6]]]], [[0, 6], [9, [2, [[0, 2], [[4, [0, 6]], [0, 7]]]]]]]]], [9, [2, [0, 1]]]]]]]]]], [0, [0, 1]]], [0, 1]]
+    formula = [2, [[0, 4], [[7, [[0, 3], [1, 10]]], [0, 11]]]]
+    n = f.invoke(subject, formula)
+    expect(n).to.equal(9)
+  })
 
   it('should eval hint (10)', function () {
     var n = f.hint([0, 1], [1, [1, 1]])
@@ -158,9 +171,17 @@ describe('macro formulas', function () {
     expect(f.macroExtend(42, [[4, [0, 1]], [4, [0, 3]]])).to.equal(43)
   })
 
-  // it('should eval invoke macro (9)', function () {
-  //   // TODO:
-  // })
+  it('should eval invoke macro (9)', function () {
+    var subject = [[[4, [0, 6]], [0, [0, 1]]], [0, 1]]
+    var formula = [2, [[0, 4], [[7, [[0, 3], [1, 2]]], [0, 11]]]]
+    var n = f.macroInvoke(subject, formula)
+    expect(n).to.equal(3)
+
+    subject = [[[6, [[5, [[1, 0], [0, 6]]], [[0, 0], [8, [[1, 0], [8, [[1, [6, [[5, [[0, 30], [4, [0, 6]]]], [[0, 6], [9, [2, [[0, 2], [[4, [0, 6]], [0, 7]]]]]]]]], [9, [2, [0, 1]]]]]]]]]], [0, [0, 1]]], [0, 1]]
+    formula = [2, [[0, 4], [[7, [[0, 3], [1, 10]]], [0, 11]]]]
+    n = f.macroInvoke(subject, formula)
+    expect(n).to.equal(9)
+  })
 
   it('should eval hint macro (10)', function () {
     var n = f.macroHint([0, 1], [1, [1, 1]])
