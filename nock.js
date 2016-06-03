@@ -16,7 +16,8 @@
    * Nock is a combinator interpreter on nouns. A noun is an atom or a cell.
    * An atom is an unsigned integer of any size; a cell is an ordered pair of nouns.
    *
-   * @see http://urbit.org/docs/theory/whitepaper#-nock
+   * @see http://urbit.org/docs/nock/definition/
+   * @see http://media.urbit.org/whitepaper.pdf
    */
 
   var useMacros = false

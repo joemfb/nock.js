@@ -44,7 +44,7 @@ npm test
 
 #### methods
 
-*See [urbit.org/docs/nock/definition/](//urbit.org/docs/nock/definition/) for an explanation of the pseudocode reduction rules that make up the Nock spec.*
+*See [urbit.org/docs/nock/definition](//urbit.org/docs/nock/definition/) for an explanation of the pseudocode reduction rules that make up the Nock spec.*
 
 ##### nock
 
@@ -206,9 +206,9 @@ Hoon -> Nock compilation is a first class primitive in Hoon *([`:code` or `!=`](
 as is the Nock formula itself *([`:nock` or `.*`](//urbit.org/docs/hoon/twig/dot-nock/tar-nock/))*:
 
 ```
-~novlen-hanweb:dojo> .*(. [1 1])
+~novlen-hanweb:dojo> .*(~ [1 1])
 1
-~novlen-hanweb:dojo> .*(. !=(1))
+~novlen-hanweb:dojo> .*(~ !=(1))
 1
 ```
 
@@ -307,4 +307,4 @@ nock.nock("[8 [8 [1 0] [1 6 [5 [1 0] 0 6] [0 0] 8 [1 0] 8 [1 6 [5 [0 30] 4 0 6] 
 // 9
 ```
 
-To get up and and running with an urbit, see [github.com/urbit/urbit](//github.com/urbit/urbit) and [urbit.org/docs/using/install/](//urbit.org/docs/using/install/).
+To get up and and running with an urbit, see [github.com/urbit/urbit](//github.com/urbit/urbit) and [urbit.org/docs/using/install](//urbit.org/docs/using/install/).
