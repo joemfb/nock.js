@@ -3,7 +3,7 @@
   'use strict'
 
   if (typeof define === 'function' && define.amd) {
-    define([], factory)
+    define('nock', [], factory)
   } else if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory()
   } else {
@@ -197,7 +197,7 @@
   }
 
   /**
-   * invoke (9): construct a core and evaluate one of it's arms against it
+   * invoke (9): construct a core and evaluate one of its arms against itself
    *
    *   *[a 9 b c]  *[a 7 c 2 [0 1] 0 b]
    */
