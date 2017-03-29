@@ -281,7 +281,15 @@
     if (Array.isArray(x)) return assoc(x)
 
     if (typeof x === 'string') {
-      var str = x.replace(/[\."']/g, '').split(' ').join(',')
+      var str = x.replace(/[\."\n\r']/g, '')
+        .replace(/\[\s*/g, '[')
+        .replace(/\s*\]/g, ']')
+        .split(' ')
+        .filter(function (a) {
+          return a.length !== 0
+        })
+        .join(',')
+
       return assoc(JSON.parse(str))
     }
 
