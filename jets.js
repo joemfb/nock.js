@@ -14,7 +14,7 @@
 
   // note: no "cold" (persistent) state
   var state = {
-    defined: [],      // "hot" state
+    defined: {},      // "hot" state
     registered: []    // "warm" state
   }
 
