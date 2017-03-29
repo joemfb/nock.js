@@ -21,6 +21,7 @@
    */
 
   var useMacros = false
+  var callbacks = {}
 
   /*
    *  code conventions:
@@ -206,8 +207,13 @@
   }
 
   function invoke (s, f) {
-    var prod = nock(s, f[1])
-    return nock(prod, slot(prod, f[0]))
+    var core = nock(s, f[1])
+
+    var next = !callbacks['9'] ? null : callbacks['9'](core, f[0])
+
+    if (next) return next()
+
+    return nock(core, slot(core, f[0]))
   }
 
   /**
@@ -222,10 +228,20 @@
   }
 
   function hint (s, f) {
+    var next = null
+
     if (wut(f[0]) === 0) {
       if (wut(f[0][1]) === 1) throw new Error('invalid hint')
-      nock(s, f[0][1])
+
+      if (callbacks['10']) {
+        next = callbacks['10'](s, f)
+      } else {
+        nock(s, f[0][1])
+      }
     }
+
+    if (next) return next()
+
     return nock(s, f[1])
   }
 
@@ -296,6 +312,22 @@
     return x
   }
 
+  function registerCallbacks (obj) {
+    if (useMacros) throw new Error('macros')
+
+    if (obj['9']) {
+      if (typeof obj['9'] !== 'function') throw new Error('bad 9 callback')
+
+      callbacks['9'] = obj['9']
+    }
+
+    if (obj['10']) {
+      if (typeof obj['10'] !== 'function') throw new Error('bad 10 callback')
+
+      callbacks['10'] = obj['10']
+    }
+  }
+
   function nockInterface () {
     var args = [].slice.call(arguments)
     var subject, formula, noun
@@ -326,6 +358,10 @@
     _nock: nock,
     useMacros: function (arg) {
       useMacros = arg === undefined || arg
+      return this
+    },
+    callbacks: function (obj) {
+      registerCallbacks(obj)
       return this
     },
     util: {
