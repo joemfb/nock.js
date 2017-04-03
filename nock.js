@@ -12,6 +12,93 @@
 }(this, function () {
   'use strict'
 
+  function Cell (a, b) {
+    if (arguments.length !== 2) throw new Error('bad args')
+    if (!(this instanceof Cell)) return new Cell(a, b)
+
+    this.hed = a
+    this.tal = b
+  }
+
+  Cell.pair = function (a, b) {
+    return new Cell(a, b)
+  }
+  Cell.trel = function (a, b, c) {
+    if (arguments.length !== 3) throw new Error('trel requires 3 args')
+    return Cell.pair(a, Cell.pair(b, c))
+  }
+  Cell.quad = function (a, b, c, d) {
+    if (arguments.length !== 4) throw new Error('quad requires 4 args')
+    return Cell.pair(a, Cell.trel(b, c, d))
+  }
+
+  Cell.fromArray = function (a) {
+    if (!(a instanceof Array)) throw new Error('bad arg')
+    if (!a.length) throw new Error('empty array')
+    return (
+      function assoc (a) {
+        if (!(a instanceof Array)) return a
+        if (!a.length) throw new Error('empty array')
+        if (a.length === 1) return assoc(a[0])
+        return Cell.pair(assoc(a[0]), assoc(a.slice(1)))
+      }
+    )(a)
+  }
+
+  Cell.fromString = function (a) {
+    if (typeof a !== 'string') throw new Error('bad arg')
+
+    var b = a.replace(/[\."\n\r']/g, '')
+      .replace(/\[\s*/g, '[')
+      .replace(/\s*\]/g, ']')
+      .split(' ')
+      .filter(function (a) {
+        return a.length !== 0
+      })
+      .join(',')
+
+    return Cell.fromArray(JSON.parse(b))
+  }
+
+  function cellEqual (a, b) {
+    if (a === b) return true
+    if (a instanceof Cell && b instanceof Cell) {
+      return cellEqual(a.hed, b.hed) && cellEqual(a.tal, b.tal)
+    }
+    return false
+  }
+
+  Cell.prototype.equal = function () {
+    return +!cellEqual(this.hed, this.tal)
+  }
+
+  Cell.prototype.slot = function (a) {
+    if (a === 0) throw new Error('slot 0')
+
+    if (a === 1) return this
+    if (a === 2) return this.hed
+    if (a === 3) return this.tal
+
+    var b = this.slot((a / 2) | 0)
+    if (!(b instanceof Cell)) throw new Error('slot ' + a)
+    return b.slot(2 + (a % 2))
+  }
+
+  Cell.prototype.toString = function () {
+    var a = this
+    var b = []
+
+    while (true) {
+      b.push(a.hed.toString())
+      if (!(a.tal instanceof Cell)) {
+        b.push(a.tal.toString())
+        break
+      }
+      a = a.tal
+    }
+    return '[' + b.join(' ') + ']'
+  }
+
   /**
    * Nock is a combinator interpreter on nouns. A noun is an atom or a cell.
    * An atom is an unsigned integer of any size; a cell is an ordered pair of nouns.
@@ -40,7 +127,7 @@
    *   ?a               1
    */
   function wut (n) {
-    return typeof n === 'number' ? 1 : 0
+    return (n instanceof Cell) ? 0 : 1
   }
 
   /**
@@ -63,7 +150,7 @@
    */
   function tis (n) {
     if (wut(n) === 1) throw new Error('tis atom')
-    return deepEqual(n[0], n[1]) ? 0 : 1
+    return n.equal()
   }
 
   /**
@@ -77,14 +164,9 @@
    *   /a               /a
    */
   function fas (addr, n) {
-    if (n === undefined) throw new Error('invalid fas noun')
-    if (addr === 0) throw new Error('invalid fas addr: 0')
-
     if (addr === 1) return n
-    if (addr === 2) return n[0]
-    if (addr === 3) return n[1]
-
-    return fas(2 + (addr % 2), fas((addr / 2) | 0, n))
+    if (n.slot === undefined) return
+    return n.slot(addr)
   }
 
   /*  formulas  */
@@ -117,15 +199,15 @@
    *   *[a 2 b c]  *[*[a b] *[a c]]
    */
   function evaluate (s, f) {
-    return nock(nock(s, f[0]), nock(s, f[1]))
+    return nock(nock(s, f.hed), nock(s, f.tal))
   }
 
   /**
-   * cell (3): test if the product is a cell
+   * deep (3): test if the product is a cell
    *
    *   *[a 3 b]         ?*[a b]
    */
-  function cell (s, f) {
+  function deep (s, f) {
     return wut(nock(s, f))
   }
 
@@ -155,14 +237,26 @@
    *   *[a 6 b c d]      *[a 2 [0 1] 2 [1 c d] [1 0] 2 [1 2 3] [1 0] 4 4 b]
    */
   function macroIfe (s, f) {
-    return nock(s, [2, [[0, 1], [2, [[1, [f[1][0], f[1][1]]], [[1, 0], [2, [[1, [2, 3]], [[1, 0], [4, [4, f[0]]]]]]]]]]])
+    return nock(s,
+      Cell.trel(2,
+        Cell(0, 1),
+        Cell.quad(2,
+          Cell.trel(1, f.tal.hed, f.tal.tal),
+          Cell(1, 0),
+          Cell.trel(2,
+            Cell.trel(1, 2, 3),
+            Cell.quad(Cell(1, 0), 4, 4, f.hed)
+          )
+        )
+      )
+    )
   }
 
   function ife (s, f) {
-    var cond = nock(s, f[0])
+    var cond = nock(s, f.hed)
 
-    if (cond === 0) return nock(s, f[1][0])
-    if (cond === 1) return nock(s, f[1][1])
+    if (cond === 0) return nock(s, f.tal.hed)
+    if (cond === 1) return nock(s, f.tal.tal)
 
     throw new Error('invalid ife conditional')
   }
@@ -173,13 +267,11 @@
    *   *[a 7 b c]  *[a 2 b 1 c]
    */
   function macroCompose (s, f) {
-    return nock(s, [2, [f[0], [1, f[1]]]])
+    return nock(s, Cell.quad(2, f.hed, 1, f.tal))
   }
 
   function compose (s, f) {
-    // alternate form:
-    // return nock(nock(s, f[0]), constant(s, f[1]))
-    return nock(nock(s, f[0]), f[1])
+    return nock(nock(s, f.hed), f.tal)
   }
 
   /**
@@ -188,13 +280,11 @@
    *   *[a 8 b c]  *[a 7 [[7 [0 1] b] 0 1] c]
    */
   function macroExtend (s, f) {
-    return nock(s, [7, [[[7, [[0, 1], f[0]]], [0, 1]], f[1]]])
+    return nock(s, Cell.trel(7, Cell(Cell.trel(7, Cell(0, 1), f.hed), Cell(0, 1)), f.tal))
   }
 
   function extend (s, f) {
-    // alternate form:
-    // return nock([compose(s, [[0, 1], f[0]]), s], f[1])
-    return nock([nock(s, f[0]), s], f[1])
+    return nock(Cell.pair(nock(s, f.hed), s), f.tal)
   }
 
   /**
@@ -203,17 +293,15 @@
    *   *[a 9 b c]  *[a 7 c 2 [0 1] 0 b]
    */
   function macroInvoke (s, f) {
-    return nock(s, [7, [f[1], [2, [[0, 1], [0, f[0]]]]]])
+    return nock(s, Cell.quad(7, f.tal, 2, Cell.trel(Cell(0, 1), 0, f.hed)))
   }
 
   function invoke (s, f) {
-    var core = nock(s, f[1])
-
-    var next = !callbacks['9'] ? null : callbacks['9'](core, f[0])
+    var core = nock(s, f.tal)
+    var next = !callbacks['9'] ? null : callbacks['9'](core, f.hed)
 
     if (next) return next()
-
-    return nock(core, slot(core, f[0]))
+    return nock(core, slot(core, f.hed))
   }
 
   /**
@@ -223,31 +311,31 @@
    *   *[a 10 b c]      *[a c]
    */
   function macroHint (s, f) {
-    if (wut(f[0]) === 0) return nock(s, [8, [f[0][1], [7, [[0, 3], f[1]]]]])
-    return nock(s, f[1])
+    if (wut(f.hed) === 0) return nock(s, Cell.trel(8, f.hed.tal, Cell.trel(7, Cell(0, 3), f.tal)))
+    return nock(s, f.tal)
   }
 
   function hint (s, f) {
     var next = null
 
-    if (wut(f[0]) === 0) {
-      if (wut(f[0][1]) === 1) throw new Error('invalid hint')
+    if (wut(f.hed) === 0) {
+      if (wut(f.hed.tal) === 1) throw new Error('invalid hint') // TODO: ???
 
       if (callbacks['10']) {
         next = callbacks['10'](s, f)
       } else {
-        nock(s, f[0][1])
+        nock(s, f.hed.tal)
       }
     }
 
     if (next) return next()
 
-    return nock(s, f[1])
+    return nock(s, f.tal)
   }
 
   /*  indexed formula functions  */
-  var macroFormulas = [slot, constant, evaluate, cell, incr, eq, macroIfe, macroCompose, macroExtend, macroInvoke, macroHint]
-  var formulas = [slot, constant, evaluate, cell, incr, eq, ife, compose, extend, invoke, hint]
+  var macroFormulas = [slot, constant, evaluate, deep, incr, eq, macroIfe, macroCompose, macroExtend, macroInvoke, macroHint]
+  var formulas = [slot, constant, evaluate, deep, incr, eq, ife, compose, extend, invoke, hint]
 
   /**
    * nock (*)
@@ -258,58 +346,15 @@
    *   *a               *a
    */
   function nock (s, f) {
-    if (wut(f[0]) === 0) return [nock(s, f[0]), nock(s, f[1])]
+    if (wut(f.hed) === 0) return Cell.pair(nock(s, f.hed), nock(s, f.tal))
 
-    var idx = f[0]
+    var idx = f.hed
 
-    if (idx > 10) throw new Error('invalid formula: ' + idx)
+    if (idx == null || idx > 10) throw new Error('invalid formula: ' + idx)
 
-    if (useMacros) return macroFormulas[idx](s, f[1])
+    if (useMacros) return macroFormulas[idx](s, f.tal)
 
-    return formulas[idx](s, f[1])
-  }
-
-  /* construct a JS noun (group an array into pairs, associating right) */
-  function assoc (x) {
-    if (!x.length) return x
-
-    if (x.length === 1) return assoc(x[0])
-
-    return [assoc(x[0]), assoc(x.slice(1))]
-  }
-
-  /* deep equality for arrays or primitives */
-  function deepEqual (a, b) {
-    if (a === b) return true
-
-    if (!(Array.isArray(a) && Array.isArray(b))) return false
-    if (a.length !== b.length) return false
-
-    for (var i = 0; i < a.length; i++) {
-      if (!deepEqual(a[i], b[i])) return false
-    }
-
-    return true
-  }
-
-  /* parse a hoon-serialized nock formula and construct a JS noun */
-  function parseNoun (x) {
-    if (Array.isArray(x)) return assoc(x)
-
-    if (typeof x === 'string') {
-      var str = x.replace(/[\."\n\r']/g, '')
-        .replace(/\[\s*/g, '[')
-        .replace(/\s*\]/g, ']')
-        .split(' ')
-        .filter(function (a) {
-          return a.length !== 0
-        })
-        .join(',')
-
-      return assoc(JSON.parse(str))
-    }
-
-    return x
+    return formulas[idx](s, f.tal)
   }
 
   function registerCallbacks (obj) {
@@ -332,25 +377,27 @@
     var args = [].slice.call(arguments)
     var subject, formula, noun
 
+    function asCell (a) {
+      if (a instanceof Array) return Cell.fromArray(a)
+      if (typeof a === 'string') return Cell.fromString(a)
+      // TODO: instanceof Cell || atom.isAtom
+      return a
+    }
+
     if (args.length === 1) {
-      formula = parseNoun(args[0])
+      formula = asCell(args[0])
     } else if (args.length === 2) {
-      subject = parseNoun(args[0])
-      formula = parseNoun(args[1])
+      subject = asCell(args[0])
+      formula = asCell(args[1])
     } else {
-      noun = assoc(args)
-      subject = noun[0]
-      formula = noun[1]
+      noun = asCell(args)
+      subject = noun.hed
+      formula = noun.tal
     }
 
     if (!formula) throw new Error('formula required')
 
-    if (!subject) {
-      // !=(~)
-      subject = [1, 0]
-    }
-
-    return nock(subject, formula)
+    return nock((subject == null) ? Cell.pair(1, 0) : subject, formula)
   }
 
   return {
@@ -364,11 +411,7 @@
       registerCallbacks(obj)
       return this
     },
-    util: {
-      assoc: assoc,
-      parseNoun: parseNoun,
-      deepEqual: deepEqual
-    },
+    Cell: Cell,
     operators: {
       wut: wut,
       lus: lus,
@@ -379,7 +422,7 @@
       slot: slot,
       constant: constant,
       evaluate: evaluate,
-      cell: cell,
+      deep: deep,
       incr: incr,
       eq: eq,
       macroIfe: macroIfe,
