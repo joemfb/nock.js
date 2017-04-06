@@ -43,11 +43,11 @@ function two (core) {
   console.log('called two!!')
   var samp = nock.formulas.slot(core, 6)
   var doorSamp = nock.formulas.slot(core, 30)
-  return [
+  return nock.Cell(
     // nock.nock(nock.formulas.slot(core, 7), [9, [5, [0, 1]]]),
     nock.operators.lus(doorSamp),
     nock.operators.lus(samp)
-  ]
+  )
 }
 
 /***************************************************/
@@ -95,6 +95,6 @@ var sampTwo = [7, [[9, [4, samp(24)]], [9, [2, samp(25)]]]]
 
 console.log()
 console.log('two')
-console.log(nock.nock(core, pullTwo))
+console.log(nock.nock(core, pullTwo).toString())
 console.log('with sample')
-console.log(nock.nock(core, sampTwo))
+console.log(nock.nock(core, sampTwo).toString())

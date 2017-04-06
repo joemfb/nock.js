@@ -21,7 +21,7 @@
   /* find registered jet by battery (in "warm" state) */
   function lookupWarm (batt) {                            // u3j_find
     var reg = state.registered.filter(function (r) {
-      return nock.util.deepEqual(r.batt, batt)
+      return !nock.Cell(r.batt, batt).equal()
     })
 
     if (!reg.length) return null
@@ -36,16 +36,16 @@
 
   /* maybe dispatch jet in place of nock 9 */
   function dispatch (core, axis) {                        // u3j_kick
-    var jet = lookupWarm(core[0])
+    var jet = lookupWarm(core.hed)
 
     // battery not registered
     if (!jet) return null
 
     // validate parent, if set
     if (jet.parent) {                                     // _cj_fine
-      var parent = nock.formulas.slot(core, jet.parent)
+      var parent = core.slot(jet.parent)
 
-      if (!lookupWarm(parent[0])) {
+      if (!lookupWarm(parent.hed)) {
         console.log('dispath "%s" missing parent', printPath(jet.path))
         return null
       }
@@ -62,31 +62,30 @@
 
   /* validate parent before registering jetted core */
   function validateParent (core, slot) {                  // _cj_mine (partial)
-    if (slot[0] !== 0) {
+    if (slot.hed !== 0) {
       console.log('bad parent slot in clue: %s', JSON.stringify(slot))
       return null
     }
 
-    var axis = slot[1]
-    var parent = nock.formulas.slot(core, axis)
-    var jet = lookupWarm(parent[0])
+    var parent = core.slot(slot.tal)
+    var jet = lookupWarm(parent.hed)
 
     if (!jet) return null
 
-    return { axis: axis, path: jet.path.slice() }
+    return { axis: slot.tal, path: jet.path.slice() }
   }
 
   /* maybe register hinted core */
   function register (clue, core) {                        // u3j_mine
-    var name = cord(clue[0])
+    var name = cord(clue.hed)
 
     // already registered
-    if (lookupWarm(core[0])) return null
+    if (lookupWarm(core.hed)) return null
 
     var parent = null
-    var slot = clue[1][0]
+    var slot = clue.tal.hed
 
-    if (!nock.util.deepEqual(slot, [1, 0])) {              // _cj_mine 0==q_cey
+    if (!(slot.hed === 1 && slot.tal === 0)) {               // _cj_mine 0==q_cey
       if (!(parent = validateParent(core, slot))) return null
     }
 
@@ -102,14 +101,14 @@
     }
 
     // TODO
-    if (clue[1][1] !== 0) {
-      console.log('register "%s" ignore hooks: %s', printPath(path), JSON.stringify(clue[1][1]))
+    if (clue.tal.tal !== 0) {
+      console.log('register "%s" ignore hooks: %s', printPath(path), clue.tal.tal.toString())
     }
 
     state.registered.push({
       path: path,
       parent: parent && parent.axis,
-      batt: core[0],
+      batt: core.hed,
       // TODO: other axes? named axes?
       arms: def.impl && { 2: def.impl }
     })
@@ -122,10 +121,10 @@
 
   /* maybe intercept hint for jet registration */
   function hint (s, f) {                                  // _n_hint
-    var hint = f[0]
-    var tag = cord(hint[0])
+    var hint = f.hed
+    var tag = cord(hint.hed)
 
-    if (tag === 'fast') return register(nock.nock(s, hint[1]), nock.nock(s, f[1]))
+    if (tag === 'fast') return register(nock.nock(s, hint.tal), nock.nock(s, f.tal))
 
     console.log('unknown hint: %s', tag);
     console.log(nock.nock(s, hint))
