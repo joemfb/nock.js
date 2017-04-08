@@ -4,8 +4,8 @@
   "description": "Nock interpreter",
   "main": "nock.js",
   "scripts": {
-    "lint": "standard nock.js test.js",
-    "test": "istanbul cover _mocha"
+    "lint": "standard nock.js lib* test*",
+    "test": "istanbul cover _mocha test*"
   },
   "tonicExampleFilename": "tonic-example.js",
   "author": "joemfb",
