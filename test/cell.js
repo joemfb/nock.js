@@ -62,6 +62,10 @@ describe('Cell', function () {
     expect(x.slot(15)).to.equal(4)
   })
 
+  it('should mug', function () {
+    expect(Cell(1, 0).mug()).to.equal(757997067)
+  })
+
   it('should print', function () {
     var x = Cell.pair(1, 2)
     expect(x.toString()).to.equal('[1 2]')
