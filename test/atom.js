@@ -29,12 +29,14 @@ describe('atom', function () {
   it('should compute murmer3', function () {
     expect(atom.util.murmer3([97], 0xcafebabe)).to.equal(3065443627)
     expect(atom.util.murmer3([232, 3], 0xcafebabe)).to.equal(4256328544)
+    expect(atom.util.murmer3([160, 134, 1], 0xcafebabe)).to.equal(3301690449)
     expect(atom.util.murmer3([0, 202, 154, 59], 0xcafebabe)).to.equal(2952922265)
   })
 
   it('should compute non-zero murmer3', function () {
     expect(atom.util.mug_trim([97], 0xcafebabe)).to.equal(917959978)
     expect(atom.util.mug_trim([232, 3], 0xcafebabe)).to.equal(2108844897)
+    expect(atom.util.mug_trim([160, 134, 1], 0xcafebabe)).to.equal(1154206800)
     expect(atom.util.mug_trim([0, 202, 154, 59], 0xcafebabe)).to.equal(805438616)
   })
 
@@ -62,6 +64,7 @@ describe('atom', function () {
     expect(atom.mug(1)).to.equal(1901865568)
     expect(atom.mug(97)).to.equal(917959978)
     expect(atom.mug(1000)).to.equal(2108844897)
+    expect(atom.mug(100000)).to.equal(1154206800)
     expect(atom.mug(1000000000)).to.equal(805438616)
   })
 })

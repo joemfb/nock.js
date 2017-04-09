@@ -64,6 +64,7 @@ describe('Cell', function () {
 
   it('should mug', function () {
     expect(Cell(1, 0).mug()).to.equal(757997067)
+    expect(Cell.quad(97, 98, 99, Cell(100, 0)).mug()).to.equal(170288530)
   })
 
   it('should print', function () {
