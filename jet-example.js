@@ -1,5 +1,7 @@
 'use strict'
 
+var Cell = require('./lib/cell')
+
 // hoon core (run as a generator)
 
 /*
@@ -35,41 +37,56 @@ var s = '\
 
 function one (core) {
   console.log('called one!!')
-  var samp = nock.formulas.slot(core, 14)
-  return nock.operators.lus(samp)
+  var samp = core.slot(14)
+  return 1 + samp
 }
 
 function two (core) {
   console.log('called two!!')
-  var samp = nock.formulas.slot(core, 6)
-  var doorSamp = nock.formulas.slot(core, 30)
-  return nock.Cell(
-    // nock.nock(nock.formulas.slot(core, 7), [9, [5, [0, 1]]]),
-    nock.operators.lus(doorSamp),
-    nock.operators.lus(samp)
+  var samp = core.slot(6)
+  var doorSamp = core.slot(30)
+  return Cell(
+    // nock.nock(core.slot(7), [9, [5, [0, 1]]]),
+    1 + doorSamp,
+    1 + samp
   )
 }
 
 /***************************************************/
 
-// instantiate and configure the interpreter
-function register (jets) {
-  var nock = require('./nock')
+var nock = require('./nock')
+var Dashboard = require('./lib/dashboard')
 
-  return nock.callbacks({ '9': jets.dispatch, '10': jets.hint })
-}
-
-var jets = require('./jets')
-
-// declare jets and register in the interpreter
-var nock = register(jets.define({
+// create a dashboard and define our jets
+var dash = Dashboard.create({ verbose:true }, {
   name: 'root',
   impl: null,
   children: [
     { name: 'one', impl: one },
     { name: 'two', impl: two }
   ]
-}))
+})
+
+// create a general hint callback
+function hint (s, f) {                                  // _n_hint
+  var hint = f.hed
+
+  // if (tag === 'fast') {
+  if (hint.hed === 0x74736166) {
+    dash.register(nock.nock(s, hint.tal), nock.nock(s, f.tal))
+    return null
+  }
+
+  console.log('unknown hint: %s', hint.hed);
+  console.log(nock.nock(s, hint))
+
+  return null
+}
+
+nock.callbacks({
+  '9': dash.dispatch.bind(dash),
+  '10': hint
+})
 
 /***************************************************/
 
