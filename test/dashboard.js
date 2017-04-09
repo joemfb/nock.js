@@ -37,9 +37,8 @@ describe('dashboard', function () {
     var core = Cell.fromString('[[1 1] 0]')
     dash.register(clue, core)
 
-    expect(dash.registered.length).to.equal(1)
-    expect(dash.registered[0].path[0]).to.equal('root')
-    expect(dash.getJet(core.hed)).to.equal(dash.registered[0])
+    expect(Object.keys(dash.registered).length).to.equal(1)
+    expect(dash.getJet(core.hed).path[0]).to.equal('root')
   })
 
   it('should dispatch', function () {
