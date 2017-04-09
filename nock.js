@@ -11,6 +11,7 @@
   }
 }(this, function () {
   var Cell = require('./lib/cell')
+  var atom = require('./lib/atom')
 
   /**
    * Nock is a combinator interpreter on nouns. A noun is an atom or a cell.
@@ -51,7 +52,7 @@
    */
   function lus (n) {
     if (wut(n) === 0) throw new Error('lus cell')
-    return 1 + n
+    return atom.incr(n)
   }
 
   /**
