@@ -9,6 +9,7 @@ var a = Cell.fromArray
 describe('test nocks', function () {
   all('nock', require('../lib/nock'))
   all('recursive-nock', require('../lib/nockr'))
+  all('stack-nock', require('../lib/nocks'))
 })
 
 function all (msg, nock) {
