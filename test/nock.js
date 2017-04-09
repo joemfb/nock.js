@@ -2,8 +2,8 @@
 'use strict'
 
 var expect = require('chai').expect
-var nock = require('./nock')
-var Cell = require('./lib/cell')
+var nock = require('../index')
+var Cell = require('../lib/cell')
 
 describe('examples', function () {
   var dec1 = [8, [1, 0], 8, [1, 6, [5, [0, 7], 4, 0, 6], [0, 6], 9, 2, [0, 2], [4, 0, 6], 0, 7], 9, 2, 0, 1]

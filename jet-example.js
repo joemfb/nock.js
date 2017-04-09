@@ -54,7 +54,7 @@ function two (core) {
 
 /***************************************************/
 
-var nock = require('./nock')
+var nock = require('./index')
 var Dashboard = require('./lib/dashboard')
 
 // create a dashboard and define our jets
