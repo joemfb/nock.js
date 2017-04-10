@@ -1,7 +1,7 @@
 'use strict'
 
 var Cell = require('./lib/cell')
-var libnock = require('./lib/nock')
+var libnock = require('./lib/nocks')
 
 function nockInterface () {
   var args = [].slice.call(arguments)
