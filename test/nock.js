@@ -148,6 +148,7 @@ function all (msg, nock) {
         var s = f('[[4 0 6] 0 0]')
         expect(nock.nock(s, f('[9 2 0 1]'))).to.equal(1)
         expect(nock.nock(s, f('[9 2 [0 2] [1 6] 0 7]'))).to.equal(7)
+        expect(nock.nock(0, f('[9 2 1 [[4 0 6] 0 0]]'))).to.equal(1)
 
         // generated via hoon:
         // [->+:dec 0 0]
