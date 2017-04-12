@@ -27,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/joemfb/nock.js/issues"
   },
-  "homepage": "https://github.com/joemfb/nock.js#readme"
+  "homepage": "https://github.com/joemfb/nock.js#readme",
+  "dependencies": {
+    "bn.js": "^4.11.6"
+  }
 }

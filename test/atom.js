@@ -5,18 +5,73 @@ var expect = require('chai').expect
 var atom = require('../lib/atom')
 var Cell = require('../lib/cell')
 
+var box = atom.bn.box
+var unbox = atom.bn.unbox
+var p32 = Math.pow(2, 32)
+
 describe('atom', function () {
   it('should test for atom', function () {
     expect(atom.isAtom(0)).to.be.true
     expect(atom.isAtom(1)).to.be.true
+    expect(atom.isAtom(box(0))).to.be.true
     expect(atom.isAtom(Cell(0, 1))).to.be.false
   })
 
   it('should increment', function () {
     expect(atom.incr(1)).to.equal(2)
     expect(atom.incr(2)).to.equal(3)
+    expect(atom.incr(p32)).to.be.an.instanceof(Object)
+    expect(unbox(atom.incr(box(p32)))).to.equal(p32 + 1)
+  })
+})
+
+describe('atom/box', function () {
+  var BN = require('bn.js')
+  var bn = atom.bn
+
+  it('should fromBytes', function () {
+    expect(bn.fromBytes([0x10, 0x5]).toNumber()).to.equal(1296)
   })
 
+  it('should box', function () {
+    expect(BN.isBN(bn.box(new BN(1)))).to.be.true
+    expect(bn.box(new BN(1)).toNumber()).to.equal(1)
+    expect(BN.isBN(bn.box(0))).to.be.true
+    expect(bn.box(0).toNumber()).to.equal(0)
+  })
+
+  it('should unbox', function () {
+    expect(bn.unbox(new BN(1))).to.equal(1)
+    expect(bn.unbox(1)).to.equal(1)
+    expect(function () {
+      bn.unbox((new BN(2)).pow(64))
+    }).to.throw(Error)
+  })
+
+  it('should boxed', function () {
+    expect(bn.boxed(new BN(1))).to.be.true
+    expect(bn.boxed(0)).to.be.false
+  })
+
+  it('should unboxed', function () {
+    expect(bn.unboxed(new BN(1))).to.be.false
+    expect(bn.unboxed(0)).to.be.true
+  })
+
+  it('should maybeBox', function () {
+    expect(bn.maybeBox(0)).to.equal(0)
+    expect(bn.unboxed(bn.maybeBox(p32))).to.be.false
+    expect(bn.maybeBox(p32).toNumber()).to.equal(p32)
+  })
+
+  it('should maybeUnbox', function () {
+    expect(bn.maybeUnbox(new BN(0))).to.equal(0)
+    expect(bn.unboxed(bn.maybeUnbox(new BN(p32)))).to.be.false
+    expect(bn.maybeUnbox(new BN(p32)).toNumber()).to.equal(p32)
+  })
+})
+
+describe('atom/murmer3', function () {
   it('should multiply uint32', function () {
     expect(atom.util.mul_uint32(0xffffffff, 0xffffffff)).to.equal(1)
     expect(atom.util.mul_uint32(10000000000, 2)).to.equal(0xa817c800)
