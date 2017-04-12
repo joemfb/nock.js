@@ -102,3 +102,84 @@ describe('jets/one', function () {
     }).to.throw(Error)
   })
 })
+
+describe('jets/two', function () {
+  var two = jets.two
+
+  it('should bex', function () {
+    expect(two.bex(2)).to.equal(4)
+    expect(unbox(two.bex(32))).to.equal(p32)
+  })
+
+  it('should cut', function () {
+    expect(two.cut(0, 0, 1, 1)).to.equal(1)
+    expect(two.cut(0, 0, 1, 2)).to.equal(0)
+    expect(two.cut(3, 0, 1, 8)).to.equal(8)
+    expect(two.cut(0, 7, 4, 1296)).to.equal(10)
+    expect(two.cut(0, 7, 4, box(1296))).to.equal(10)
+  })
+
+  it('should met', function () {
+    expect(two.met(0, 1)).to.equal(1)
+    expect(two.met(0, 10)).to.equal(4)
+    expect(two.met(3, 1000)).to.equal(2)
+    expect(two.met(0, box(p32))).to.equal(33)
+    expect(two.met(5, box(p32))).to.equal(2)
+  })
+
+  it('should end', function () {
+    expect(two.end(0, 1, 1)).to.equal(1)
+    expect(two.end(0, 1, 2)).to.equal(0)
+    expect(two.end(3, 1, 8)).to.equal(8)
+  })
+
+  it('should rsh', function () {
+    expect(two.rsh(0, 1, 8)).to.equal(4)
+    expect(two.rsh(3, 1, 8)).to.equal(0)
+  })
+
+  it('should rip', function () {
+    var x = two.rip(3, 1000)
+    expect(x.hed).to.equal(232)
+    expect(x.tal.hed).to.equal(3)
+    expect(x.tal.tal).to.equal(0)
+  })
+
+  it('should rub', function () {
+    var x = two.rub(1, 1296)
+    expect(x.hed).to.equal(10)
+    expect(x.tal).to.equal(10)
+
+    var n = box(1296)
+    x = two.rub(1, n)
+    expect(unbox(n)).to.equal(1296)
+
+    x = two.rub(3, 4657)
+    expect(x.hed).to.equal(3)
+    expect(x.tal).to.equal(1)
+
+    x = two.rub(8, 4657)
+    expect(x.hed).to.equal(3)
+    expect(x.tal).to.equal(0)
+  })
+
+  it('should cue', function () {
+    expect(two.cue(2)).to.equal(0)
+    expect(two.cue(1296)).to.equal(10)
+
+    var x = two.cue(411761)
+    expect(x.hed).to.equal(1)
+    expect(x.tal.hed).to.equal(2)
+    expect(x.tal.tal).to.equal(1)
+
+    x = two.cue(3426417)
+    expect(x.hed).to.equal(1)
+    expect(x.tal.hed).to.equal(2)
+    expect(x.tal.tal).to.equal(3)
+
+    x = two.cue(box(10162991658945))
+    expect(x.hed).to.equal(123)
+    expect(x.tal.hed).to.equal(456)
+    expect(x.tal.tal).to.equal(123)
+  })
+})
