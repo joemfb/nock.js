@@ -71,28 +71,12 @@ describe('atom/box', function () {
   })
 })
 
-describe('atom/murmer3', function () {
-  it('should multiply uint32', function () {
-    expect(atom.util.mul_uint32(0xffffffff, 0xffffffff)).to.equal(1)
-    expect(atom.util.mul_uint32(10000000000, 2)).to.equal(0xa817c800)
-    expect(atom.util.mul_uint32(0x80000000, 2)).to.equal(0)
-    expect(atom.util.mul_uint32(0x7fffffff, 2)).to.equal(0xfffffffe)
-  })
-
-  // TODO: rol_uint32
-
-  it('should compute murmer3', function () {
-    expect(atom.util.murmer3([97], 0xcafebabe)).to.equal(3065443627)
-    expect(atom.util.murmer3([232, 3], 0xcafebabe)).to.equal(4256328544)
-    expect(atom.util.murmer3([160, 134, 1], 0xcafebabe)).to.equal(3301690449)
-    expect(atom.util.murmer3([0, 202, 154, 59], 0xcafebabe)).to.equal(2952922265)
-  })
-
+describe('atom/util', function () {
   it('should compute non-zero murmer3', function () {
-    expect(atom.util.mug_trim([97], 0xcafebabe)).to.equal(917959978)
-    expect(atom.util.mug_trim([232, 3], 0xcafebabe)).to.equal(2108844897)
-    expect(atom.util.mug_trim([160, 134, 1], 0xcafebabe)).to.equal(1154206800)
-    expect(atom.util.mug_trim([0, 202, 154, 59], 0xcafebabe)).to.equal(805438616)
+    expect(atom.util.mugTrim([97], 0xcafebabe)).to.equal(917959978)
+    expect(atom.util.mugTrim([232, 3], 0xcafebabe)).to.equal(2108844897)
+    expect(atom.util.mugTrim([160, 134, 1], 0xcafebabe)).to.equal(1154206800)
+    expect(atom.util.mugTrim([0, 202, 154, 59], 0xcafebabe)).to.equal(805438616)
   })
 
   it('should rip bytes', function () {
