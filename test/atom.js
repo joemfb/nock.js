@@ -112,6 +112,13 @@ describe('atom/murmer3', function () {
     expect(a[1]).to.equal(202)
     expect(a[2]).to.equal(154)
     expect(a[3]).to.equal(59)
+
+    a = atom.util.ripBytes(box(p32 - 2))
+    expect(a.length).to.equal(4)
+    expect(a[0]).to.equal(254)
+    expect(a[1]).to.equal(255)
+    expect(a[2]).to.equal(255)
+    expect(a[3]).to.equal(255)
   })
 
   it('should mug', function () {
@@ -121,5 +128,10 @@ describe('atom/murmer3', function () {
     expect(atom.mug(1000)).to.equal(2108844897)
     expect(atom.mug(100000)).to.equal(1154206800)
     expect(atom.mug(1000000000)).to.equal(805438616)
+
+    var n = box(0x7261626f6f66)
+    expect(atom.mug(n)).to.equal(1900388185)
+    expect(atom.mug(n)).to.equal(n._mug)
+    expect(n._mug).to.equal(1900388185)
   })
 })
