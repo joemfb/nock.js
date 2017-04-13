@@ -52,6 +52,10 @@ describe('Cell', function () {
     expect(x.slot(2)).to.equal(1)
     expect(x.slot(3)).to.equal(2)
 
+    expect(x.slot(1)).to.equal(x.slowSlot(1))
+    expect(x.slot(2)).to.equal(x.slowSlot(2))
+    expect(x.slot(3)).to.equal(x.slowSlot(3))
+
     x = Cell.quad(1, 2, 3, 4)
     expect(x.slot(1)).to.equal(x)
     expect(x.slot(2)).to.equal(1)
@@ -60,6 +64,14 @@ describe('Cell', function () {
     expect(x.slot(7)).to.be.an.instanceof(Cell)
     expect(x.slot(14)).to.equal(3)
     expect(x.slot(15)).to.equal(4)
+
+    expect(x.slot(1)).to.equal(x.slowSlot(1))
+    expect(x.slot(2)).to.equal(x.slowSlot(2))
+    expect(x.slot(3)).to.equal(x.slowSlot(3))
+    expect(x.slot(6)).to.equal(x.slowSlot(6))
+    expect(x.slot(7)).to.equal(x.slowSlot(7))
+    expect(x.slot(14)).to.equal(x.slowSlot(14))
+    expect(x.slot(15)).to.equal(x.slowSlot(15))
   })
 
   it('should mug', function () {
