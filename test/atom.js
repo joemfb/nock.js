@@ -29,10 +29,6 @@ describe('atom/box', function () {
   var BN = require('bn.js')
   var bn = atom.bn
 
-  it('should fromBytes', function () {
-    expect(bn.fromBytes([0x10, 0x5]).toNumber()).to.equal(1296)
-  })
-
   it('should box', function () {
     expect(BN.isBN(bn.box(new BN(1)))).to.be.true
     expect(bn.box(new BN(1)).toNumber()).to.equal(1)
@@ -72,37 +68,63 @@ describe('atom/box', function () {
 })
 
 describe('atom/util', function () {
-  it('should compute non-zero murmer3', function () {
-    expect(atom.util.mugTrim([97], 0xcafebabe)).to.equal(917959978)
-    expect(atom.util.mugTrim([232, 3], 0xcafebabe)).to.equal(2108844897)
-    expect(atom.util.mugTrim([160, 134, 1], 0xcafebabe)).to.equal(1154206800)
-    expect(atom.util.mugTrim([0, 202, 154, 59], 0xcafebabe)).to.equal(805438616)
+  it('should box bytes', function () {
+    expect(atom.util.fromBytes([0x10, 0x5])).to.equal(1296)
+
+    var n = atom.util.toBytes(atom.util.fromBytes([0x10, 0x5]))
+    expect(n).to.be.an.instanceof(Array)
+    expect(n.length).to.equal(2)
+    expect(n[0]).to.equal(0x10)
+    expect(n[1]).to.equal(0x5)
   })
 
   it('should rip bytes', function () {
-    var a = atom.util.ripBytes(97)
+    var a = atom.util.toBytes(97)
     expect(a).to.be.an.instanceof(Array)
     expect(a.length).to.equal(1)
     expect(a[0]).to.equal(97)
+    expect(atom.util.fromBytes(a)).to.equal(97)
 
-    a = atom.util.ripBytes(1000)
+    a = atom.util.toBytes(1000)
     expect(a.length).to.equal(2)
     expect(a[0]).to.equal(232)
     expect(a[1]).to.equal(3)
+    expect(atom.util.fromBytes(a)).to.equal(1000)
 
-    a = atom.util.ripBytes(1000000000)
+    a = atom.util.toBytes(1000000000)
     expect(a.length).to.equal(4)
     expect(a[0]).to.equal(0)
     expect(a[1]).to.equal(202)
     expect(a[2]).to.equal(154)
     expect(a[3]).to.equal(59)
+    expect(atom.util.fromBytes(a)).to.equal(1000000000)
 
-    a = atom.util.ripBytes(box(p32 - 2))
+    a = atom.util.toBytes(box(p32 - 2))
     expect(a.length).to.equal(4)
     expect(a[0]).to.equal(254)
     expect(a[1]).to.equal(255)
     expect(a[2]).to.equal(255)
     expect(a[3]).to.equal(255)
+    expect(atom.util.fromBytes(a)).to.equal(p32 - 2)
+  })
+
+  it('should convert from cord', function () {
+    expect(atom.util.fromCord('fast')).to.equal(0x74736166)
+    expect(atom.util.fromCord('fast')).to.equal(atom.util.fromCord('f', 'a', 's', 't'))
+    expect(unbox(atom.util.fromCord('foobar'))).to.equal(0x7261626f6f66)
+    expect(unbox(atom.util.fromCord('foobar'))).to.equal(unbox(atom.util.fromCord('f', 'o', 'o', 'b', 'a', 'r')))
+  })
+
+  it('should convert to cord', function () {
+    expect(atom.util.toCord(0x74736166)).to.equal('fast')
+    expect(atom.util.toCord(box(0x7261626f6f66))).to.equal('foobar')
+  })
+
+  it('should compute non-zero murmer3', function () {
+    expect(atom.util.mugTrim([97], 0xcafebabe)).to.equal(917959978)
+    expect(atom.util.mugTrim([232, 3], 0xcafebabe)).to.equal(2108844897)
+    expect(atom.util.mugTrim([160, 134, 1], 0xcafebabe)).to.equal(1154206800)
+    expect(atom.util.mugTrim([0, 202, 154, 59], 0xcafebabe)).to.equal(805438616)
   })
 
   it('should mug', function () {
