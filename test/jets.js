@@ -117,6 +117,20 @@ describe('jets/two', function () {
     expect(two.cut(3, 0, 1, 8)).to.equal(8)
     expect(two.cut(0, 7, 4, 1296)).to.equal(10)
     expect(two.cut(0, 7, 4, box(1296))).to.equal(10)
+    expect(two.cut(0, 0, 2, box(p32 - 1))).to.equal(3)
+    expect(two.cut(0, 25, 2, box(p32 - 1))).to.equal(3)
+    expect(two.cut(0, 27, 9, box(10162991658945))).to.equal(456)
+    expect(two.cut(0, 42, 2, box(10162991658945))).to.equal(2)
+
+    // (jam [1 (reap 2 (gulf 'a' 'c'))])
+    var n = jets.one.add(0xc1c3c171,
+      jets.one.add(
+        jets.one.mul(0x36c7c1c5, p32),
+        jets.one.mul(642, jets.one.mul(p32, p32))
+      )
+    )
+
+    expect(two.cut(0, 49, 7, n)).to.equal(99)
   })
 
   it('should met', function () {
@@ -131,6 +145,13 @@ describe('jets/two', function () {
     expect(two.end(0, 1, 1)).to.equal(1)
     expect(two.end(0, 1, 2)).to.equal(0)
     expect(two.end(3, 1, 8)).to.equal(8)
+    expect(two.end(0, 12, box(p32 - 1))).to.equal(Math.pow(2, 12) - 1)
+    expect(two.end(0, 26, box(p32 - 1))).to.equal(Math.pow(2, 26) - 1)
+    expect(two.end(0, 26, box(p32 - 1))).to.equal(box(p32 - 1).words[0])
+    expect(two.end(0, 31, p32)).to.equal(0)
+    expect(two.end(0, 31, p32 - 1)).to.equal(p31 - 1)
+    expect(two.end(0, 31, box(p32))).to.equal(0)
+    expect(two.end(0, 31, box(p32 - 1))).to.equal(p31 - 1)
   })
 
   it('should rsh', function () {
