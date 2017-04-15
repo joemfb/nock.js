@@ -23,6 +23,14 @@ describe('atom', function () {
     expect(atom.incr(p32)).to.be.an.instanceof(Object)
     expect(unbox(atom.incr(box(p32)))).to.equal(p32 + 1)
   })
+
+  it('should test equality', function () {
+    expect(atom.equal(1, 1)).to.be.true
+    expect(atom.equal(1, 2)).to.be.false
+    expect(atom.equal(p32, box(p32))).to.be.true
+    expect(atom.equal(box(p32), box(p32))).to.be.true
+    expect(atom.equal(box(p32), box(p32 - 1))).to.be.false
+  })
 })
 
 describe('atom/box', function () {
