@@ -224,6 +224,17 @@ describe('jets/two', function () {
     expect(two.end(0, 31, box(p32))).to.equal(0)
     expect(two.end(0, 31, box(p32 - 1))).to.equal(p31 - 1)
 
+    // (rip 3 0x1.faad.deaf.beef.abcd)
+    var n = atom.util.fromBytes([205, 171, 239, 190, 175, 222, 173, 250, 1])
+    var p = atom.util.fromBytes([205, 171, 239, 190, 175, 222, 173, 250])
+    expect(atom.equal(p, two.end(6, 1, n))).to.be.true
+
+    expect(two.end(6, 1, 0xfaaddeafbeef)).to.equal(275624672345839)
+    expect(two.end(6, 1, 179166895)).to.equal(179166895)
+
+    n = atom.util.fromBytes([239, 190, 175, 222, 173, 250, 0, 0, 205, 171, 239, 190, 175, 222, 173, 250])
+    expect(unbox(two.end(6, 1, n))).to.equal(275624672345839)
+
     var x = jets.two.end(Cell.trel(0, Cell.trel(0, 1, 1), 4))
     expect(x).to.equal(two.end(0, 1, 1))
   })
