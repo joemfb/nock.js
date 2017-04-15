@@ -159,13 +159,37 @@ describe('jets/two', function () {
     expect(two.cut(0, 7, 4, box(1296))).to.equal(10)
     expect(two.cut(0, 0, 2, box(p32 - 1))).to.equal(3)
     expect(two.cut(0, 25, 2, box(p32 - 1))).to.equal(3)
+
+    // (jam [123 456 123])
     expect(two.cut(0, 27, 9, box(10162991658945))).to.equal(456)
     expect(two.cut(0, 42, 2, box(10162991658945))).to.equal(2)
+
+    // (jam %fast)
+    var n = atom.util.fromBytes([192, 55, 11, 155, 163, 3])
+    expect(two.cut(0, 11, 31, n)).to.equal(1953718630)
+
+    // (jam %foobars)
+    n = atom.util.fromBytes([128, 215, 236, 237, 77, 44, 76, 110, 14])
+    expect(atom.equal(
+      // `@`%foobars
+      atom.util.fromBytes([102, 111, 111, 98, 97, 114, 115]),
+      two.cut(0, 13, 55, n)
+    )).to.be.true
+
+    // (rip 3 (jam [0x1.dead.beef.cede.deae 0]))
+    n = atom.util.fromBytes([1, 12, 92, 189, 189, 157, 223, 125, 91, 189, 11])
+    expect(atom.equal(
+      atom.util.fromBytes([174, 222, 222, 206, 239, 190, 173, 222, 1]),
+      two.cut(0, 17, 65, n)
+    )).to.be.true
+
+    n = atom.util.fromBytes([239, 190, 175, 222, 173, 250, 0, 0, 205, 171, 239, 190, 175, 222, 173, 250])
+    expect(unbox(two.cut(6, 0, 1, n))).to.equal(275624672345839)
 
     var one = jets.raw.one
 
     // (jam [1 (reap 2 (gulf 'a' 'c'))])
-    var n = one.add(0xc1c3c171,
+    n = one.add(0xc1c3c171,
       one.add(
         one.mul(0x36c7c1c5, p32),
         one.mul(642, one.mul(p32, p32))
